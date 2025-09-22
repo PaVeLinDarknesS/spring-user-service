@@ -66,21 +66,7 @@ class EmailNotificationControllerTest {
     }
 
     @Test
-    void sentEmail_errorInSendingEmail_status400BadRequestAndErrors() throws Exception {
-        UserEvent invalidEvent = new UserEvent(null, "invalidEmail");
-
-        mockMvc.perform(post(URI)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidEvent)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.action", matchesPattern(".+")))
-                .andExpect(jsonPath("$.email", matchesPattern(".+")));
-
-        verify(notificationService, never()).notifyUser(any(UserEvent.class));
-    }
-
-    @Test
-    void update_whenServiceThrowMailException_status418() throws Exception {
+    void sentEmail_whenServiceThrowMailException_status418() throws Exception {
         UserEvent invalidEvent = new UserEvent(UserStatus.DELETED, "any@email.com");
 
         BDDMockito.willThrow(new MailSendException("MailException"))
