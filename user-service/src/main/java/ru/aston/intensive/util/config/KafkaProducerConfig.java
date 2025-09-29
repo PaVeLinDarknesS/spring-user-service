@@ -2,7 +2,7 @@ package ru.aston.intensive.util.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -18,15 +18,15 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    @Autowired
+    private KafkaProperty kafkaProperty;
 
     @Bean
     public ProducerFactory<UserStatus, UserEvent> producerFactory(
             ObjectMapper objectMapper
     ) {
         Map<String, Object> configProperties = new HashMap<>();
-        configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperty.getBootstrapServers());
 
         JsonSerializer<UserStatus> keySerializer = new JsonSerializer<>(objectMapper);
         keySerializer.setAddTypeInfo(false);
