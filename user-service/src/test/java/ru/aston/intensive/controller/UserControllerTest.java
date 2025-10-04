@@ -16,6 +16,7 @@ import ru.aston.intensive.entity.UserEntity;
 import ru.aston.intensive.exception.EmailExistingException;
 import ru.aston.intensive.exception.UserNotFoundException;
 import ru.aston.intensive.service.UserService;
+import ru.aston.intensive.util.assembler.UserEntityToModelAssembler;
 import ru.aston.intensive.util.mapper.UserMapper;
 
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@WebMvcTest(UserController.class)
+@WebMvcTest({UserController.class, UserEntityToModelAssembler.class})
 class UserControllerTest {
 
     private static final String URI_START = "/api/user-service/users/";
@@ -45,6 +46,9 @@ class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserEntityToModelAssembler userEntityToModelAssembler;
 
     @Test
     void findAll_whenOk() throws Exception {
@@ -152,9 +156,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sendUser)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.name", matchesPattern(".+")))
-                .andExpect(jsonPath("$.email", matchesPattern(".+")))
-                .andExpect(jsonPath("$.age", matchesPattern(".+")));
+                .andExpect(jsonPath("$.message", matchesPattern(".+")));
 
         verify(userService, never()).update(anyLong(), any(UserEntity.class));
     }

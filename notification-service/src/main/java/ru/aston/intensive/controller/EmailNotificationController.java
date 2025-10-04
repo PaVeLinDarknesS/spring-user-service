@@ -22,6 +22,6 @@ public class EmailNotificationController {
 
         emailNotificationService.notifyUser(userEvent);
 
-        return ResponseEntity.ok("Email отправлен, проверьте почту");
+        return ResponseEntity.ok().build();
     }
 }

@@ -12,6 +12,7 @@ import ru.aston.intensive.dto.UserEvent;
 import ru.aston.intensive.enumerated.UserStatus;
 import ru.aston.intensive.service.EmailNotificationService;
 import ru.aston.intensive.service.UserEventConsumer;
+import ru.aston.intensive.util.config.KafkaProperty;
 
 import java.util.Set;
 
@@ -21,11 +22,11 @@ import java.util.Set;
 public class UserEventConsumerImpl implements UserEventConsumer {
 
     private final Validator validator;
-
     private final EmailNotificationService emailService;
+    private final KafkaProperty kafkaProperty;
 
     @Override
-    @KafkaListener(topics = "user-events", groupId = "notification-user-group")
+    @KafkaListener(topics = "#{@kafkaProperty.topic}", groupId = "#{@kafkaProperty.consumerGroupId}")
     public void consumeUserEvent(ConsumerRecord<UserStatus, UserEvent> record) {
         log.info(
                 "Received order: order={}, key={}, partition={}",

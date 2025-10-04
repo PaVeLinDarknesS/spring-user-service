@@ -4,7 +4,7 @@ package ru.aston.intensive.util.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -21,8 +21,8 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    @Autowired
+    private KafkaProperty kafkaProperty;
 
     @Bean
     public ConsumerFactory<String, UserEvent> consumerFactory(
@@ -30,9 +30,9 @@ public class KafkaConsumerConfig {
     ) {
 
         Map<String, Object> propMap = new HashMap<>();
-        propMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        propMap.put(ConsumerConfig.GROUP_ID_CONFIG, "notification-user-group");
-        propMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        propMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperty.getBootstrapServers());
+        propMap.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperty.getConsumerGroupId());
+        propMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, kafkaProperty.getAutoOffset());
 
         JsonDeserializer<UserEvent> jsonDeserializer =
                 new JsonDeserializer<>(UserEvent.class, objectMapper);
