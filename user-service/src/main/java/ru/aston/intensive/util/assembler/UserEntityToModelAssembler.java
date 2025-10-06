@@ -4,7 +4,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import ru.aston.intensive.controller.UserController;
+import ru.aston.intensive.controller.UserControllerImpl;
 import ru.aston.intensive.dto.UserResponseDto;
 import ru.aston.intensive.entity.UserEntity;
 import ru.aston.intensive.util.mapper.UserMapper;
@@ -20,10 +20,10 @@ public class UserEntityToModelAssembler implements
     public EntityModel<UserResponseDto> toModel(UserEntity entity) {
 
         return EntityModel.of(UserMapper.entityToDto(entity),
-                linkTo(methodOn(UserController.class).find(entity.getId())).withSelfRel(),
-                linkTo(methodOn(UserController.class).create(null)).withRel("create"),
-                linkTo(methodOn(UserController.class).update(entity.getId(), null)).withRel("update"),
-                linkTo(methodOn(UserController.class).delete(entity.getId())).withRel("delete"),
-                linkTo(methodOn(UserController.class).findAll()).withRel(IanaLinkRelations.COLLECTION));
+                linkTo(methodOn(UserControllerImpl.class).find(entity.getId())).withSelfRel(),
+                linkTo(methodOn(UserControllerImpl.class).create(null)).withRel("create"),
+                linkTo(methodOn(UserControllerImpl.class).update(entity.getId(), null)).withRel("update"),
+                linkTo(methodOn(UserControllerImpl.class).delete(entity.getId())).withRel("delete"),
+                linkTo(methodOn(UserControllerImpl.class).findAll()).withRel(IanaLinkRelations.COLLECTION));
     }
 }

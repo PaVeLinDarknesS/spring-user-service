@@ -1,52 +1,29 @@
 package ru.aston.intensive.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.aston.intensive.dto.UserRequestDto;
 import ru.aston.intensive.dto.UserResponseDto;
-import ru.aston.intensive.entity.UserEntity;
 import ru.aston.intensive.exception.ApiError;
-import ru.aston.intensive.service.UserService;
-import ru.aston.intensive.util.assembler.UserEntityToModelAssembler;
-import ru.aston.intensive.util.mapper.UserMapper;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/user-service/users/")
-@Log4j2
-@RequiredArgsConstructor
 @Tag(name = "User Management", description = "APIs for managing users")
-@Validated
-public class UserController {
-
-    private final UserService userService;
-    private final UserEntityToModelAssembler userEntityToModelAssembler;
+public interface UserController {
 
     @Operation(
             summary = "Find users",
             description = "Find all users"
     )
     @Tag(name = "Get")
-    @GetMapping
-    public ResponseEntity<List<EntityModel<UserResponseDto>>> findAll() {
-        return ResponseEntity.ok(userService.findAll().stream()
-                .map(userEntityToModelAssembler::toModel)
-                .toList());
-    }
+    public ResponseEntity<List<EntityModel<UserResponseDto>>> findAll();
 
     @Operation(
             summary = "Find user",
@@ -79,16 +56,9 @@ public class UserController {
             }
     )
     @Tag(name = "Get")
-    @GetMapping(path = "{id}")
     public ResponseEntity<EntityModel<UserResponseDto>> find(
-            @PathVariable(name = "id")
-            @Min(value = 1, message = "ID must be at least 1")
-            @Parameter(description = "User ID", example = "1", required = true)
-            Long id) {
-
-        return ResponseEntity
-                .ok(userEntityToModelAssembler.toModel(userService.findById(id)));
-    }
+            @PathVariable
+            Long id);
 
     @Operation(
             summary = "Create user",
@@ -120,23 +90,9 @@ public class UserController {
                     )
             }
     )
-    @PostMapping
     public ResponseEntity<EntityModel<UserResponseDto>> create(
-            @Valid
             @RequestBody
-            @Parameter(
-                    description = "User data for creation",
-                    required = true,
-                    example = "{\"username\": \"john_doe\", \"email\": \"john@example.com\"\", \"age\": \"20\"}"
-            )
-            UserRequestDto userRequestDto) {
-        UserEntity userEntity = UserMapper.dtoToEntity(userRequestDto);
-        userEntity = userService.create(userEntity);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userEntityToModelAssembler.toModel(userEntity));
-    }
+            UserRequestDto userRequestDto);
 
     @Operation(
             summary = "Update user",
@@ -177,22 +133,11 @@ public class UserController {
                     )
             }
     )
-    @PutMapping(path = "{id}")
     public ResponseEntity<EntityModel<UserResponseDto>> update(
-            @PathVariable(name = "id")
-            @Min(value = 1, message = "ID must be at least 1")
-            @Parameter(description = "User ID", example = "1", required = true)
+            @PathVariable
             Long id,
-            @Parameter(
-                    description = "User data for creation",
-                    required = true,
-                    example = "{\"username\": \"john_doe\", \"email\": \"john@example.com\"\", \"age\": \"20\"}"
-            )
-            @Valid @RequestBody UserRequestDto userRequestDto) {
-        UserEntity userEntity = UserMapper.dtoToEntity(userRequestDto);
-        return ResponseEntity
-                .ok(userEntityToModelAssembler.toModel(userService.update(id, userEntity)));
-    }
+            @RequestBody
+            UserRequestDto userRequestDto);
 
     @Operation(
             summary = "Delete user",
@@ -212,16 +157,7 @@ public class UserController {
                     )
             }
     )
-    @DeleteMapping(path = "{id}")
-    public ResponseEntity<String> delete(
-            @PathVariable(name = "id")
-            @Min(value = 1, message = "ID must be at least 1")
-            @Parameter(description = "User ID", example = "1", required = true)
-            Long id) {
-
-        userService.delete(id);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body("Successfully deleted user with id = " + id);
-    }
+    ResponseEntity<String> delete(
+            @PathVariable
+            Long id);
 }
