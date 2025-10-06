@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailSendException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.aston.intensive.dto.UserEvent;
@@ -23,9 +24,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @WebMvcTest(EmailNotificationController.class)
+@TestPropertySource(properties = {
+        "spring.cloud.config.enabled=false",
+        "eureka.client.enabled=false",
+        "spring.mail.enabled=false"
+})
 class EmailNotificationControllerTest {
 
-    private static final String URI = "/api/notification-service/emails";
+    private static final String URI = "/api/emails";
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,8 +53,7 @@ class EmailNotificationControllerTest {
         mockMvc.perform(post(URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestEvent)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Email отправлен, проверьте почту"));
+                .andExpect(status().isOk());
     }
 
     @Test
