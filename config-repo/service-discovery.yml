@@ -1,0 +1,18 @@
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 60000
+    renewal-percent-threshold: 0.85
+    renewal-threshold-update-interval-ms: 90000
+    expected-client-renewal-interval-seconds: 30
+    peer-eureka-nodes-update-interval-ms: 60000
+    wait-time-in-ms-when-sync-empty: 300000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

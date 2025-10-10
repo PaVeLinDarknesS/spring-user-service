@@ -1,0 +1,31 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+    instance-id: "${spring.application.name}:${random.uuid}"
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+
+logging:
+  file.name: "application.log"
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  logback.rollingpolicy:
+    max-file-size: 10MB
+    max-history: 30
+  level:
+    root: INFO
+    ru.aston.intensive: DEBUG
+    org.springframework:
+      web: DEBUG
+      jdbc: DEBUG
+      sql: DEBUG
+      cloud:
+        netflix.eureka: INFO
+        gateway: DEBUG
+    com.netflix.eureka: OFF
+    com.netflix.discovery: OFF

@@ -10,16 +10,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.aston.intensive.dto.UserEvent;
 import ru.aston.intensive.enumerated.UserStatus;
 import ru.aston.intensive.resolver.EmailMessageResolver;
+import ru.aston.intensive.service.impl.EmailNotificationServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
+@SpringBootTest(
+        classes = {
+                EmailMessageResolver.class,
+                EmailNotificationServiceImpl.class,
+                JavaMailSenderImpl.class
+        }
+)
+@TestPropertySource(properties = {
+        "spring.cloud.config.enabled=false",
+        "eureka.client.enabled=false"
+})
 @ActiveProfiles("test")
 public class EmailIntegrationTest {
 

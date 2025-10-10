@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.aston.intensive.dto.UserRequestDto;
@@ -33,10 +36,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@WebMvcTest({UserController.class, UserEntityToModelAssembler.class})
-class UserControllerTest {
+@WebMvcTest(
+        controllers = UserControllerImpl.class,
+        includeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE, classes = UserEntityToModelAssembler.class)
+)
+@TestPropertySource(properties = {
+        "spring.cloud.config.enabled=false",
+        "eureka.client.enabled=false",
+        "spring.jpa.enabled=false",
+        "spring.data.jpa.enabled=false"
+})
+class UserControllerImplTest {
 
-    private static final String URI_START = "/api/user-service/users/";
+    private static final String URI_START = "/api/users/";
 
     @Autowired
     private MockMvc mockMvc;

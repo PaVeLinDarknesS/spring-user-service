@@ -12,7 +12,7 @@ import ru.aston.intensive.service.EmailNotificationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/notification-service/emails")
+@RequestMapping("/api/emails")
 public class EmailNotificationController {
 
     private final EmailNotificationService emailNotificationService;

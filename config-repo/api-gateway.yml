@@ -1,0 +1,105 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+          use-ip-address: true
+      routes:
+        - id: user-service-get
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+            - Method=GET
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: serviceRead
+                fallbackUri: forward:/fallback/users/read
+            - StripPrefix=0
+
+        - id: user-service-write
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+            - Method=POST,PUT,DELETE
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: serviceWrite
+                fallbackUri: forward:/fallback/users/read
+            - StripPrefix=0
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/emails/**
+            - Method=POST,PUT,DELETE
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: serviceWrite
+                fallbackUri: forward:/fallback/emails
+            - StripPrefix=0
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      readConfig:
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 30
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 5
+        slowCallRateThreshold: 40
+        slowCallDurationThreshold: 2s
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException
+
+      writeConfig:
+        slidingWindowSize: 50
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 60
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slowCallRateThreshold: 80
+        slowCallDurationThreshold: 5s
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException
+
+  timelimiter:
+    configs:
+      readConfig:
+        timeoutDuration: 3s
+        cancelRunningFuture: true
+      writeConfig:
+        timeoutDuration: 10s
+        cancelRunningFuture: false
+
+    instances:
+      serviceRead:
+        baseConfig: readConfig
+      serviceWrite:
+        baseConfig: writeConfig
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    io.github.resilience4j: INFO
+    reactor.netty: INFO
+    org.springframework.cloud:
+      gateway: INFO
+      web: INFO

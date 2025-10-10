@@ -6,21 +6,38 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.aston.intensive.dto.UserEvent;
 import ru.aston.intensive.enumerated.UserStatus;
 import ru.aston.intensive.service.impl.UserEventConsumerImpl;
+import ru.aston.intensive.util.config.KafkaProperty;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
+@SpringBootTest(
+        classes = {
+                ValidationAutoConfiguration.class,
+                EmailNotificationService.class,
+                UserEventConsumerImpl.class
+        }
+)
 @ActiveProfiles("test")
+@TestPropertySource(properties = {
+        "spring.cloud.config.enabled=false",
+        "eureka.client.enabled=false",
+        "spring.kafka.enabled=false"
+})
 class UserEventConsumerTest {
+
+    @MockitoBean
+    private KafkaProperty kafkaProperty;
 
     @Autowired
     private Validator validator;
