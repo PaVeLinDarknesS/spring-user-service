@@ -5,7 +5,7 @@ spring:
   application:
     name: notification-service
   config:
-    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888}"
   cloud:
     config:
       fail-fast: true
@@ -13,3 +13,11 @@ spring:
         initial-interval: 1000
         max-attempts: 6
         max-interval: 2000
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info
